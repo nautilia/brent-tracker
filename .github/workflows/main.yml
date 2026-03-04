@@ -1,0 +1,28 @@
+name: Actualizar Brent
+on:
+  schedule:
+    - cron: '0 19 * * *' # 20:00h España (invierno)
+  workflow_dispatch:      # Esto activa un botón para probarlo a mano
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Instalar librerias
+        run: pip install yfinance pandas
+      - name: Ejecutar script
+        run: python update_brent.py
+      - name: Guardar cambios
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git add brent_precios.csv
+          git commit -m "Update Brent data" || exit 0
+          git push
